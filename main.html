@@ -1,0 +1,594 @@
+<div class="head"></div>
+                    <div class="body"></div>
+                    <div class="underwear" style="background-color: ${underwearColor}"></div>
+                    <div class="legs">
+                        <div class="leg"></div>
+                        <div class="leg"></div>
+</div><!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Магический предсказатель по белью</title>
+    <style>
+        /* Основные стили */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            padding: 20px;
+            box-sizing: border-box;
+            position: relative;
+            overflow: hidden;
+            background-color: #F3E5F5;
+            background-image: linear-gradient(to bottom right, #F3E5F5, #E1BEE7);
+        }
+
+        /* Фон с человечками */
+        .people-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.2;
+            pointer-events: none;
+        }
+
+        .person {
+            position: absolute;
+            width: 40px;
+            height: 60px;
+            animation: float 15s infinite linear;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+
+        .person .head {
+            width: 20px;
+            height: 20px;
+            background-color: #B29580;
+            border-radius: 50%;
+            margin: 0 auto;
+        }
+
+        .person .body {
+            width: 24px;
+            height: 20px;
+            background-color: #B29580;
+            margin: 0 auto;
+        }
+
+        .person .underwear {
+            width: 28px;
+            height: 10px;
+            margin: 0 auto;
+            border-radius: 4px;
+        }
+
+        .person .legs {
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .person .leg {
+            width: 8px;
+            height: 20px;
+            background-color: #B29580;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0) translateX(0) rotate(0deg); }
+            25% { transform: translateY(-20px) translateX(10px) rotate(2deg); }
+            50% { transform: translateY(0) translateX(20px) rotate(0deg); }
+            75% { transform: translateY(20px) translateX(10px) rotate(-2deg); }
+            100% { transform: translateY(0) translateX(0) rotate(0deg); }
+        }
+
+        /* Основной контейнер */
+        .container {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            padding: 30px;
+            width: 80%;
+            max-width: 500px;
+            text-align: center;
+            margin-bottom: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        /* Яркие цветовые варианты */
+        .color-options {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .color-option {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+        }
+
+        .color-option:hover {
+            transform: scale(1.15);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .color-option[data-color="красный"] { background-color: #FF0000; }
+        .color-option[data-color="синий"] { background-color: #0000FF; }
+        .color-option[data-color="белый"] { 
+            background-color: #FFFFFF;
+            border: 1px solid #E0E0E0;
+        }
+        .color-option[data-color="черный"] { background-color: #000000; }
+        .color-option[data-color="розовый"] { background-color: #FF1493; }
+        .color-option[data-color="фиолетовый"] { background-color: #8A2BE2; }
+        .color-option[data-color="оранжевый"] { background-color: #FF8C00; }
+        .color-option[data-color="зеленый"] { background-color: #00FF00; }
+        .color-option[data-color="желтый"] { background-color: #FFFF00; }
+        .color-option[data-color="коричневый"] { background-color: #A52A2A; }
+        .color-option[data-color="серый"] { background-color: #808080; }
+        .color-option[data-color="разноцветное"] { 
+            background: linear-gradient(45deg, 
+                #FF0000, #FF8C00, #FFFF00, #00FF00, 
+                #0000FF, #8A2BE2, #FF1493);
+        }
+
+        .prediction {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            background-color: #f0f0f0;
+            display: none;
+        }
+
+        .fun-text {
+            font-style: italic;
+            margin-top: 10px;
+            color: #666;
+        }
+
+        .user-stats {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #e3f2fd;
+            border-radius: 10px;
+        }
+
+        .level-bar {
+            height: 10px;
+            background-color: #ddd;
+            border-radius: 5px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+
+        .level-progress {
+            height: 100%;
+            background-color: #4caf50;
+            width: 0%;
+            transition: width 0.5s;
+        }
+
+        .level-info {
+            margin-top: 5px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .streak-info {
+            font-weight: bold;
+            color: #ff5722;
+        }
+
+        .social-share {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .share-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.3s;
+            border: none;
+            color: white;
+            font-size: 18px;
+        }
+        
+        .share-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .instagram { background-color: #E1306C; }
+        .facebook { background-color: #3b5998; }
+        .vk { background-color: #4a76a8; }
+        .telegram { background-color: #0088cc; }
+        
+        .share-text {
+            margin-top: 15px;
+            font-size: 0.9em;
+            color: #666;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="people-container" id="people-container"></div>
+    
+    <div class="container">
+        <h1>🔮 Магический предсказатель дня 🔮</h1>
+        <p>Какого цвета ваше нижнее белье сегодня?</p>
+        
+        <div class="color-options">
+            <div class="color-option" data-color="красный" ></div>
+            <div class="color-option" data-color="синий"></div>
+            <div class="color-option" data-color="белый"></div>
+            <div class="color-option" data-color="черный"></div>
+            <div class="color-option" data-color="розовый"></div>
+            <div class="color-option" data-color="фиолетовый"></div>
+            <div class="color-option" data-color="оранжевый"></div>
+            <div class="color-option" data-color="зеленый"></div>
+            <div class="color-option" data-color="желтый"></div>
+            <div class="color-option" data-color="коричневый"></div>
+            <div class="color-option" data-color="серый"></div>
+            <div class="color-option" data-color="разноцветное"></div>
+        </div>
+        
+        <div class="prediction" id="prediction">
+            <h2>Ваше предсказание на сегодня:</h2>
+            <p id="prediction-text"></p>
+            
+            <div class="share-text">Поделиться предсказанием:</div>
+            <div class="social-share">
+                <button class="share-btn instagram" onclick="shareTo('instagram')">
+                    <i class="fab fa-instagram"></i>
+                </button>
+                <button class="share-btn facebook" onclick="shareTo('facebook')">
+                    <i class="fab fa-facebook-f"></i>
+                </button>
+                <button class="share-btn vk" onclick="shareTo('vk')">
+                    <i class="fab fa-vk"></i>
+                </button>
+                <button class="share-btn telegram" onclick="shareTo('telegram')">
+                    <i class="fab fa-telegram-plane"></i>
+                </button>
+            </div>
+            
+            <p class="fun-text">Помните: это всего лишь шутка, не принимайте близко к сердцу!</p>
+        </div>
+        
+        <div class="user-stats" id="user-stats">
+            <div>Ваш уровень: <span id="user-level">1</span></div>
+            <div class="level-info">Следующий уровень через: <span id="next-level">3</span> дня</div>
+            <div class="level-bar">
+                <div class="level-progress" id="level-progress"></div>
+            </div>
+            <div class="streak-info">Дней подряд: <span id="streak-days">0</span> 🔥</div>
+        </div>
+    </div>
+
+    <script>
+        // Генерация человечков
+        function createPeople() {
+            const container = document.getElementById('people-container');
+            const colors = ['#FF0000', '#0000FF', '#FFFFFF', '#000000', 
+                         '#FF1493', '#8A2BE2', '#FF8C00', '#00FF00',
+                         '#FFFF00', '#A52A2A', '#808080'];
+            
+            for (let i = 0; i < 20; i++) {
+                const person = document.createElement('div');
+                person.className = 'person';
+                person.style.left = `${Math.random() * 100}%`;
+                person.style.top = `${Math.random() * 100}%`;
+                person.style.animationDelay = `${Math.random() * 5}s`;
+                
+                const underwearColor = colors[Math.floor(Math.random() * colors.length)];
+                
+                person.innerHTML = `
+                    <div class="head"></div>
+                    <div class="body"></div>
+                    <div class="underwear" style="background-color: ${underwearColor}"></div>
+                    <div class="legs">
+                        <div class="leg"></div>
+                        <div class="leg"></div>
+                    </div>
+                `;
+                
+                container.appendChild(person);
+            }
+        }
+
+        // Система предсказаний
+        const userData = {
+            lastVisit: null,
+            streak: 0,
+            level: 1,
+            totalVisits: 0,
+            lastColor: null
+        };
+        
+        function loadUserData() {
+            const savedData = localStorage.getItem('underwearFortuneData');
+            return savedData ? JSON.parse(savedData) : {...userData};
+        }
+        
+        function saveUserData(data) {
+            localStorage.setItem('underwearFortuneData', JSON.stringify(data));
+        }
+        
+        function isFirstVisitToday(data) {
+            if (!data.lastVisit) return true;
+            const lastVisitDate = new Date(data.lastVisit);
+            const today = new Date();
+            return lastVisitDate.toDateString() !== today.toDateString();
+        }
+        
+        function updateVisitStats() {
+            const today = new Date();
+            const data = loadUserData();
+            
+            if (isFirstVisitToday(data)) {
+                const lastVisitDate = data.lastVisit ? new Date(data.lastVisit) : null;
+                const yesterday = new Date(today);
+                yesterday.setDate(yesterday.getDate() - 1);
+                
+                if (lastVisitDate && lastVisitDate.toDateString() === yesterday.toDateString()) {
+                    data.streak += 1;
+                } else if (lastVisitDate) {
+                    data.streak = 1;
+                } else {
+                    data.streak = 1;
+                }
+                
+                data.lastVisit = today.toISOString();
+                data.totalVisits += 1;
+                data.level = Math.min(Math.floor(data.streak / 3) + 1, 5);
+                saveUserData(data);
+            }
+            
+            return data;
+        }
+        
+        function showUserStats(data) {
+            document.getElementById('user-level').textContent = data.level;
+            document.getElementById('streak-days').textContent = data.streak;
+            
+            const daysToNextLevel = 3 - (data.streak % 3);
+            document.getElementById('next-level').textContent = daysToNextLevel;
+            
+            const progressPercentage = ((data.streak % 3) / 3) * 100;
+            document.getElementById('level-progress').style.width = `${progressPercentage}%`;
+        }
+        
+        function generatePrediction(color, level, date) {
+            const dayOfWeek = date.getDay();
+            const dayOfMonth = date.getDate();
+            const month = date.getMonth();
+            
+            const basePredictions = {
+                'красный': [
+                    'Сегодня вас ждет страстное приключение!',
+                    'Будьте готовы к неожиданным встречам.',
+                    'Смелые решения приведут к успеху.'
+                ],
+                'синий': [
+                    'День спокойствия и гармонии.',
+                    'Идеальное время для размышлений.',
+                    'Творчество принесет плоды.'
+                ],
+                'белый': [
+                    'Чистота и новые начинания.',
+                    'Сделайте то, что давно откладывали.',
+                    'Свежие идеи для новых дел.'
+                ],
+                'черный': [
+                    'Тайны и загадки окружают вас.',
+                    'Будьте внимательны к знакам судьбы.',
+                    'Глубины подсознания откроются вам.'
+                ],
+                'розовый': [
+                    'Романтика в воздухе!',
+                    'Вы особенно привлекательны сегодня.',
+                    'Нежные чувства на первом плане.'
+                ],
+                'фиолетовый': [
+                    'День магии и интуиции.',
+                    'Доверьтесь внутреннему голосу.',
+                    'Мистические совпадения не случайны.'
+                ],
+                'оранжевый': [
+                    'Энергия бьет ключом!',
+                    'Отличный день для активных действий.',
+                    'Новые проекты ждут вашего участия.'
+                ],
+                'зеленый': [
+                    'Гармония с природой и финансовая удача.',
+                    'Возможны неожиданные денежные поступления.',
+                    'Стабильность и рост во всех делах.'
+                ],
+                'желтый': [
+                    'Солнечный день полный радости.',
+                    'Ваша улыбка принесет удачу.',
+                    'Оптимизм поможет преодолеть препятствия.'
+                ],
+                'коричневый': [
+                    'Практичный день.',
+                    'Хорошее время для решения бытовых вопросов.',
+                    'Надежность и стабильность в делах.'
+                ],
+                'серый': [
+                    'Нейтральный день.',
+                    'Отдохните и не принимайте важных решений.',
+                    'Размеренность - ключ к успеху.'
+                ],
+                'разноцветное': [
+                    'Сегодня вас ждет полная неожиданностей!',
+                    'Будьте готовы ко всему.',
+                    'Разнообразие событий не даст скучать.'
+                ]
+            };
+            
+            const levelModifiers = [
+                '', 
+                ' А ваша интуиция сегодня особенно сильна!',
+                ' Звезды благосклонны к вам сегодня!',
+                ' Это знак свыше - действуйте смело!',
+                ' Вселенная шепчет вам свои секреты...',
+                ' Вы на пике магических сил! Используйте это!'
+            ];
+            
+            const dayModifiers = [
+                ' Воскресные чудеса уже рядом!',
+                ' Понедельник - день сложный, но вам повезет!',
+                ' Вторник благоволит смелым решениям.',
+                ' Среда - день неожиданных поворотов.',
+                ' Четверг принесет приятные сюрпризы.',
+                ' Пятница - день исполнения желаний!',
+                ' Суббота создана для приключений!'
+            ];
+            
+            const basePrediction = basePredictions[color][Math.floor(Math.random() * basePredictions[color].length)];
+            let fullPrediction = basePrediction;
+            fullPrediction += levelModifiers[Math.min(level, levelModifiers.length - 1)];
+            fullPrediction += dayModifiers[dayOfWeek];
+            
+            if (month === 11 && dayOfMonth === 31) {
+                fullPrediction = "Под цветом белья скрывается новогоднее чудо! Этот день будет волшебным!";
+            } else if (month === 1 && dayOfMonth === 14) {
+                fullPrediction = "Даже цвет белья говорит о вашей романтической натуре сегодня! Любовь витает в воздухе!";
+            }
+            
+            return fullPrediction;
+        }
+        
+        function getBackgroundColor(color) {
+            const colorsMap = {
+                'красный': '#FFEBEE',
+                'синий': '#E3F2FD',
+                'белый': '#FFFFFF',
+                'черный': '#212121',
+                'розовый': '#FCE4EC',
+                'фиолетовый': '#F3E5F5',
+                'оранжевый': '#FFF3E0',
+                'зеленый': '#E8F5E9',
+                'желтый': '#FFFDE7',
+                'коричневый': '#EFEBE9',
+                'серый': '#FAFAFA',
+                'разноцветное': '#F3E5F5'
+            };
+            return colorsMap[color] || '#F3E5F5';
+        }
+        
+        function shareTo(socialNetwork) {
+            const predictionText = document.getElementById('prediction-text').textContent;
+            const userData = loadUserData();
+            const level = userData.level || 1;
+            
+            const shareText = `🔮 Магическое предсказание (уровень ${level}):\n\n` +
+                             `${predictionText}\n\n` +
+                             `✨ Попробуй и ты: ${window.location.href}`;
+            
+            let url = '';
+            
+            switch(socialNetwork) {
+                case 'instagram':
+                    copyToClipboard(shareText);
+                    alert('Предсказание скопировано! Вставьте в Instagram Stories или пост.');
+                    break;
+                    
+                case 'facebook':
+                    url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}&quote=${encodeURIComponent(shareText)}`;
+                    openShareWindow(url);
+                    break;
+                    
+                case 'vk':
+                    url = `https://vk.com/share.php?url=${encodeURIComponent(window.location.href)}&title=Магическое предсказание&description=${encodeURIComponent(shareText)}`;
+                    openShareWindow(url);
+                    break;
+                    
+                case 'telegram':
+                    url = `https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(shareText)}`;
+                    openShareWindow(url);
+                    break;
+            }
+        }
+        
+        function openShareWindow(url) {
+            window.open(url, '_blank', 'width=600,height=400');
+        }
+        
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+        
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', function() {
+            createPeople();
+            
+            const colorOptions = document.querySelectorAll('.color-option');
+            const predictionDiv = document.getElementById('prediction');
+            const predictionText = document.getElementById('prediction-text');
+            
+            const userData = updateVisitStats();
+            showUserStats(userData);
+            
+            colorOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    const color = this.getAttribute('data-color');
+                    const today = new Date();
+                    const prediction = generatePrediction(color, userData.level, today);
+                    
+                    predictionText.textContent = prediction;
+                    predictionDiv.style.display = 'block';
+                    
+                    userData.lastColor = color;
+                    saveUserData(userData);
+                    
+                    predictionDiv.scrollIntoView({ behavior: 'smooth' });
+                    document.body.style.backgroundColor = getBackgroundColor(color);
+                });
+            });
+            
+            if (!isFirstVisitToday(userData) && userData.lastColor) {
+                const today = new Date();
+                const prediction = generatePrediction(userData.lastColor, userData.level, today);
+                
+                predictionText.textContent = "Сегодня вы уже получали предсказание:\n\n" + prediction;
+                predictionDiv.style.display = 'block';
+                document.body.style.backgroundColor = getBackgroundColor(userData.lastColor);
+            }
+        });
+    </script>
+</body>
+</html>
